@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Nuxt module for DockTHOR error and performance monitoring",
   "license": "MIT",
-  "author": "Jacek Labudda <j.sultan@dock.codes>",
+  "author": "Jacek Sultan <j.sultan@dock.codes>",
   "homepage": "https://dock.codes",
   "repository": {
     "type": "git",
