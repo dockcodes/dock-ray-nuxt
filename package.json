@@ -35,12 +35,12 @@
     "test": "node --test test/*.test.js"
   },
   "peerDependencies": {
-    "nuxt": "^3.0.0 || ^4.0.0"
+    "nuxt": "^3.13.0 || ^4.0.0"
   },
   "dependencies": {
     "@dockcodes/dock-thor": "^1.0.0"
   },
   "devDependencies": {
-    "@nuxt/kit": "^3.13.0"
+    "@nuxt/kit": "^3.13.0 || ^4.0.0"
   }
 }
