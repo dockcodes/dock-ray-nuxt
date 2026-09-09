@@ -1,9 +1,9 @@
 import { useRuntimeConfig } from '#imports';
-import { useThor } from './client.js';
-import { registerThorHooks } from './nitro.js';
+import { useRay } from './client.js';
+import { registerRayHooks } from './nitro.js';
 
-export default function thorNitroPlugin(nitroApp) {
-    const config = useRuntimeConfig().thor ?? {};
+export default function rayNitroPlugin(nitroApp) {
+    const config = useRuntimeConfig().ray ?? {};
 
-    registerThorHooks(nitroApp, useThor(config), config);
+    registerRayHooks(nitroApp, useRay(config), config);
 }

@@ -1,4 +1,4 @@
-import { DockThorClient } from '@dockcodes/dock-thor';
+import { DockRayClient } from '@dockcodes/dock-ray';
 
 let client = null;
 
@@ -9,12 +9,12 @@ let client = null;
  * is only meaningful once Nitro has started — importing this module during the
  * build must not try to read it.
  */
-export function useThor(config) {
+export function useRay(config) {
     if (client) {
         return client;
     }
 
-    client = new DockThorClient({
+    client = new DockRayClient({
         token: config.token,
         privateKey: config.privateKey,
         url: config.url,
@@ -28,6 +28,6 @@ export function useThor(config) {
     return client;
 }
 
-export function resetThor() {
+export function resetRay() {
     client = null;
 }

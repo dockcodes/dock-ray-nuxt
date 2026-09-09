@@ -8,8 +8,8 @@ const MAX_BODY_BYTES = 16384;
  * treated as untrusted — the SDK keeps the fields it recognises and refuses
  * the rest.
  */
-export function forwardBrowserReport(thor, { body, headers = {}, address = 'unknown', limiter }) {
-    if (!thor.enabled) {
+export function forwardBrowserReport(ray, { body, headers = {}, address = 'unknown', limiter }) {
+    if (!ray.enabled) {
         return false;
     }
 
@@ -29,7 +29,7 @@ export function forwardBrowserReport(thor, { body, headers = {}, address = 'unkn
         return false;
     }
 
-    thor.report(thor.captureBrowserReport(payload, {
+    ray.report(ray.captureBrowserReport(payload, {
         pageUrl: headers.referer,
         userAgent: headers['user-agent'],
     }));

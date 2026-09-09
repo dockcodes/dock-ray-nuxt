@@ -1,21 +1,21 @@
-# @dockcodes/dock-thor-nuxt
+# @dockcodes/dock-ray-nuxt
 
-Nuxt module for [DockTHOR](https://dock.codes). Reports server errors, request
+Nuxt module for [DockRay](https://dockray.io). Reports server errors, request
 timings, Vue component errors and — optionally — JavaScript errors from the
 browser. Works with Nuxt 3 and 4.
 
 ## Installation
 
 ```bash
-npm install @dockcodes/dock-thor-nuxt
+npm install @dockcodes/dock-ray-nuxt
 ```
 
 ```ts
 // nuxt.config.ts
 export default defineNuxtConfig({
-    modules: ['@dockcodes/dock-thor-nuxt'],
+    modules: ['@dockcodes/dock-ray-nuxt'],
 
-    thor: {
+    ray: {
         tracesSampleRate: 0.2,
         browser: { enabled: false },
     },
@@ -23,12 +23,11 @@ export default defineNuxtConfig({
 ```
 
 ```dotenv
-NUXT_THOR_TOKEN=project-token
-NUXT_THOR_PRIVATE_KEY=project-private-key
-NUXT_THOR_URL=https://thor.dock.codes
+NUXT_RAY_TOKEN=project-token
+NUXT_RAY_PRIVATE_KEY=project-private-key
 ```
 
-Nuxt maps `NUXT_THOR_*` onto `runtimeConfig.thor`, so credentials stay out of
+Nuxt maps `NUXT_RAY_*` onto `runtimeConfig.ray`, so credentials stay out of
 `nuxt.config.ts` and out of git. The module puts them in the **private**
 runtime config only — everything under `runtimeConfig.public` is serialised
 into the client bundle, and a project key there is a published key. Without a
@@ -38,7 +37,6 @@ token and a key the module loads and sends nothing.
 
 | Option | Default | Meaning |
 |---|---|---|
-| `url` | `https://thor.dock.codes` | DockTHOR instance |
 | `environment` | `NODE_ENV` | environment column in the panel |
 | `release` | — | deployed version |
 | `sampleRate` | `1` | share of error events sent |
@@ -46,7 +44,7 @@ token and a key the module loads and sends nothing.
 | `sendDefaultPii` | `false` | attach IP address and user agent |
 | `ignorePaths` | `['/_nuxt', '/__nuxt', '/health', '/metrics']` | paths never measured |
 | `browser.enabled` | `false` | collect JavaScript errors |
-| `browser.endpoint` | `/api/_thor/browser` | route that receives them |
+| `browser.endpoint` | `/api/_ray/browser` | route that receives them |
 | `browser.sampleRate` | `1` | share of browser errors reported |
 
 ## What the server reports
@@ -77,7 +75,7 @@ deployment needs no second code path.
 Off by default:
 
 ```ts
-thor: {
+ray: {
     browser: { enabled: true },
 }
 ```
@@ -102,8 +100,8 @@ page view by default, with `ResizeObserver loop` and cross-origin
 From your own code:
 
 ```js
-window.DockThor?.captureException(error);
-window.DockThor?.captureMessage('Checkout step skipped');
+window.DockRay?.captureException(error);
+window.DockRay?.captureMessage('Checkout step skipped');
 ```
 
 ## What is reported and what is not

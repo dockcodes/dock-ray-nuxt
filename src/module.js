@@ -1,7 +1,7 @@
 import { addPlugin, addServerHandler, addServerPlugin, createResolver, defineNuxtModule } from '@nuxt/kit';
 
 /**
- * Nuxt module wiring DockTHOR into both halves of the app.
+ * Nuxt module wiring DockRay into both halves of the app.
  *
  * The server half gets the credentials and reports directly. The browser half
  * never does: its errors go to a Nitro route in this same app, which forwards
@@ -9,15 +9,15 @@ import { addPlugin, addServerHandler, addServerPlugin, createResolver, defineNux
  */
 export default defineNuxtModule({
     meta: {
-        name: '@dockcodes/dock-thor-nuxt',
-        configKey: 'thor',
+        name: '@dockcodes/dock-ray-nuxt',
+        configKey: 'ray',
         compatibility: { nuxt: '>=3.0.0' },
     },
 
     defaults: {
         token: '',
         privateKey: '',
-        url: 'https://thor.dock.codes',
+        url: 'https://dockray.io',
         environment: '',
         release: '',
         sampleRate: 1,
@@ -26,7 +26,7 @@ export default defineNuxtModule({
         ignorePaths: ['/_nuxt', '/__nuxt', '/health', '/metrics'],
         browser: {
             enabled: false,
-            endpoint: '/api/_thor/browser',
+            endpoint: '/api/_ray/browser',
             sampleRate: 1,
             maxEvents: 10,
         },
@@ -40,7 +40,7 @@ export default defineNuxtModule({
          | under `public` is serialised into the client bundle. The browser
          | section is public on purpose — it holds only an endpoint path.
          */
-        nuxt.options.runtimeConfig.thor = {
+        nuxt.options.runtimeConfig.ray = {
             token: options.token,
             privateKey: options.privateKey,
             url: options.url,
@@ -50,15 +50,15 @@ export default defineNuxtModule({
             tracesSampleRate: options.tracesSampleRate,
             sendDefaultPii: options.sendDefaultPii,
             ignorePaths: options.ignorePaths,
-            ...nuxt.options.runtimeConfig.thor,
+            ...nuxt.options.runtimeConfig.ray,
         };
 
-        nuxt.options.runtimeConfig.public.thor = {
+        nuxt.options.runtimeConfig.public.ray = {
             browser: {
                 ...options.browser,
                 release: options.browser.release ?? options.release,
             },
-            ...nuxt.options.runtimeConfig.public.thor,
+            ...nuxt.options.runtimeConfig.public.ray,
         };
 
         addServerPlugin(resolve('./runtime/server/plugin.js'));

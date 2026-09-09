@@ -4,14 +4,14 @@ import { describeEvent, routeNameFor, shouldIgnore } from './request.js';
  * Registers the Nitro hooks. Split from the plugin entry point so it can be
  * exercised without a running Nuxt app.
  */
-export function registerThorHooks(nitroApp, thor, config = {}) {
-    if (!thor.enabled) {
+export function registerRayHooks(nitroApp, ray, config = {}) {
+    if (!ray.enabled) {
         return;
     }
 
     nitroApp.hooks.hook('request', (event) => {
         event.context = event.context ?? {};
-        event.context.thorStartedAt = Date.now() / 1000;
+        event.context.rayStartedAt = Date.now() / 1000;
     });
 
     nitroApp.hooks.hook('error', (error, context = {}) => {
@@ -22,7 +22,7 @@ export function registerThorHooks(nitroApp, thor, config = {}) {
         const event = context.event;
         const described = event ? describeEvent(event) : {};
 
-        thor.report(thor.captureException(error, {
+        ray.report(ray.captureException(error, {
             request: described.http,
             user: described.user,
             tags: event ? { route: routeNameFor(event) } : {},
@@ -34,7 +34,7 @@ export function registerThorHooks(nitroApp, thor, config = {}) {
      | the panel starts when the visitor already has their bytes.
      */
     nitroApp.hooks.hook('afterResponse', (event) => {
-        const startedAt = event?.context?.thorStartedAt;
+        const startedAt = event?.context?.rayStartedAt;
 
         if (!startedAt || shouldIgnore(event, config.ignorePaths ?? [])) {
             return;
@@ -42,7 +42,7 @@ export function registerThorHooks(nitroApp, thor, config = {}) {
 
         const described = describeEvent(event);
 
-        thor.report(thor.captureTransaction({
+        ray.report(ray.captureTransaction({
             name: routeNameFor(event),
             url: described.http.url,
             method: described.http.method,
@@ -54,7 +54,7 @@ export function registerThorHooks(nitroApp, thor, config = {}) {
         }));
     });
 
-    nitroApp.hooks.hook('close', () => thor.close());
+    nitroApp.hooks.hook('close', () => ray.close());
 }
 
 /**

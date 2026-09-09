@@ -4,8 +4,8 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import test from 'node:test';
 
-import { DockThorClient } from '@dockcodes/dock-thor';
-import { registerThorHooks } from '../src/runtime/server/nitro.js';
+import { DockRayClient } from '@dockcodes/dock-ray';
+import { registerRayHooks } from '../src/runtime/server/nitro.js';
 import { createRateLimiter, forwardBrowserReport } from '../src/runtime/server/browser.js';
 import { addressOf, describeEvent, routeNameFor, shouldIgnore } from '../src/runtime/server/request.js';
 
@@ -69,7 +69,7 @@ function h3Event({ path = '/orders/8123', method = 'GET', status = 200, matched 
 
 test('the module never puts credentials in the public runtime config', () => {
     const module = readFileSync(new URL('../src/module.js', import.meta.url), 'utf8');
-    const publicBlock = module.slice(module.indexOf('runtimeConfig.public.thor'));
+    const publicBlock = module.slice(module.indexOf('runtimeConfig.public.ray'));
 
     for (const secret of ['privateKey', 'token']) {
         assert.equal(publicBlock.includes(secret), false, `${secret} must not reach the client bundle`);
@@ -81,7 +81,7 @@ test('the client plugin never imports the node client', () => {
         const source = readFileSync(new URL(`../src/runtime/plugins/${file}`, import.meta.url), 'utf8');
 
         assert.deepEqual([...source.matchAll(/from '(node:[^']+)'/g)], []);
-        assert.equal(source.includes("from '@dockcodes/dock-thor'"), false);
+        assert.equal(source.includes("from '@dockcodes/dock-ray'"), false);
     }
 });
 
@@ -108,20 +108,20 @@ test('ignored paths stay out of the panel', () => {
 
 test('the transaction is reported on afterResponse, not during the request', async () => {
     await withPanel(async (url, received) => {
-        const thor = new DockThorClient({ token: 'tok', privateKey: 'key', url, tracesSampleRate: 1 });
+        const ray = new DockRayClient({ token: 'tok', privateKey: 'key', url, tracesSampleRate: 1 });
         const nitro = fakeNitro();
 
-        registerThorHooks(nitro, thor, { ignorePaths: ['/_nuxt'] });
+        registerRayHooks(nitro, ray, { ignorePaths: ['/_nuxt'] });
 
         const event = h3Event({ status: 201 });
 
         nitro.fire('request', event);
-        await thor.flush();
+        await ray.flush();
 
         assert.equal(received.length, 0, 'nothing goes out while the request is being handled');
 
         nitro.fire('afterResponse', event);
-        await thor.flush();
+        await ray.flush();
 
         assert.equal(received.length, 1);
         assert.equal(received[0].path, '/api/v1/tok/transaction');
@@ -136,18 +136,18 @@ test('the transaction is reported on afterResponse, not during the request', asy
 
 test('server faults are reported and expected 4xx are not', async () => {
     await withPanel(async (url, received) => {
-        const thor = new DockThorClient({ token: 'tok', privateKey: 'key', url });
+        const ray = new DockRayClient({ token: 'tok', privateKey: 'key', url });
         const nitro = fakeNitro();
 
-        registerThorHooks(nitro, thor, {});
+        registerRayHooks(nitro, ray, {});
 
         nitro.fire('error', Object.assign(new Error('not found'), { statusCode: 404 }), { event: h3Event() });
-        await thor.flush();
+        await ray.flush();
 
         assert.equal(received.length, 0, 'a 404 is the caller getting it wrong');
 
         nitro.fire('error', new Error('database is down'), { event: h3Event() });
-        await thor.flush();
+        await ray.flush();
 
         assert.equal(received.length, 1);
         assert.equal(received[0].payload.exception.values[0].value, 'database is down');
@@ -158,7 +158,7 @@ test('server faults are reported and expected 4xx are not', async () => {
 test('hooks are not registered at all without credentials', () => {
     const nitro = fakeNitro();
 
-    registerThorHooks(nitro, new DockThorClient(), {});
+    registerRayHooks(nitro, new DockRayClient(), {});
 
     assert.equal(nitro.has('request'), false);
     assert.equal(nitro.has('afterResponse'), false);
@@ -166,16 +166,16 @@ test('hooks are not registered at all without credentials', () => {
 
 test('a browser report is forwarded with a server-side envelope', async () => {
     await withPanel(async (url, received) => {
-        const thor = new DockThorClient({ token: 'tok', privateKey: 'key', url, environment: 'production' });
+        const ray = new DockRayClient({ token: 'tok', privateKey: 'key', url, environment: 'production' });
 
-        const accepted = forwardBrowserReport(thor, {
+        const accepted = forwardBrowserReport(ray, {
             body: JSON.stringify({ type: 'TypeError', message: 'null is not an object' }),
             headers: { referer: 'https://shop.test/cart', 'user-agent': 'Firefox/130' },
             address: '203.0.113.7',
         });
 
         assert.equal(accepted, true);
-        await thor.flush();
+        await ray.flush();
 
         assert.equal(received[0].payload.platform, 'javascript');
         assert.equal(received[0].payload.tags.source, 'browser');
@@ -185,14 +185,14 @@ test('a browser report is forwarded with a server-side envelope', async () => {
 
 test('oversized, malformed and flooding reports are refused', async () => {
     await withPanel(async (url, received) => {
-        const thor = new DockThorClient({ token: 'tok', privateKey: 'key', url });
-        const post = (body, limiter) => forwardBrowserReport(thor, { body, address: '203.0.113.7', limiter });
+        const ray = new DockRayClient({ token: 'tok', privateKey: 'key', url });
+        const post = (body, limiter) => forwardBrowserReport(ray, { body, address: '203.0.113.7', limiter });
 
         assert.equal(post(JSON.stringify({ message: 'x'.repeat(20000) })), false, 'over 16 KB');
         assert.equal(post('not json'), false, 'malformed');
         assert.equal(post(''), false, 'empty');
 
-        await thor.flush();
+        await ray.flush();
         assert.equal(received.length, 0, 'none of those reach the panel');
 
         const limiter = createRateLimiter({ limit: 2 });
@@ -201,15 +201,15 @@ test('oversized, malformed and flooding reports are refused', async () => {
         assert.equal(post(JSON.stringify({ message: 'b' }), limiter), true);
         assert.equal(post(JSON.stringify({ message: 'c' }), limiter), false, 'past the window limit');
 
-        await thor.flush();
+        await ray.flush();
         assert.equal(received.length, 2);
     });
 });
 
 test('a flood of malformed bodies is rate limited too', () => {
-    const thor = new DockThorClient({ token: 'tok', privateKey: 'key', url: 'http://127.0.0.1:1' });
+    const ray = new DockRayClient({ token: 'tok', privateKey: 'key', url: 'http://127.0.0.1:1' });
     const limiter = createRateLimiter({ limit: 2 });
-    const post = () => forwardBrowserReport(thor, { body: 'not json', address: '203.0.113.7', limiter });
+    const post = () => forwardBrowserReport(ray, { body: 'not json', address: '203.0.113.7', limiter });
 
     post();
     post();

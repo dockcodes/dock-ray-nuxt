@@ -1,13 +1,13 @@
 {
-  "name": "@dockcodes/dock-thor-nuxt",
+  "name": "@dockcodes/dock-ray-nuxt",
   "version": "1.0.0",
-  "description": "Nuxt module for DockTHOR error and performance monitoring",
+  "description": "Nuxt module for DockRay error and performance monitoring",
   "license": "MIT",
   "author": "Jacek Sultan <j.sultan@dock.codes>",
-  "homepage": "https://dock.codes",
+  "homepage": "https://dockray.io",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dockcodes/dock-thor-nuxt.git"
+    "url": "git+https://github.com/dockcodes/dock-ray-nuxt.git"
   },
   "keywords": [
     "nuxt",
@@ -31,14 +31,11 @@
   "engines": {
     "node": ">=18"
   },
-  "scripts": {
-    "test": "node --test test/*.test.js"
-  },
   "peerDependencies": {
     "nuxt": "^3.13.0 || ^4.0.0"
   },
   "dependencies": {
-    "@dockcodes/dock-thor": "^1.0.0"
+    "@dockcodes/dock-ray": "^1.0.0"
   },
   "devDependencies": {
     "@nuxt/kit": "^3.13.0 || ^4.0.0"

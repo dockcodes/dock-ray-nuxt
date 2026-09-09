@@ -1,14 +1,14 @@
 import { defineEventHandler, getRequestHeaders, readRawBody, setResponseStatus, useRuntimeConfig } from '#imports';
-import { useThor } from '../client.js';
+import { useRay } from '../client.js';
 import { addressOf } from '../request.js';
 import { createRateLimiter, forwardBrowserReport } from '../browser.js';
 
 const limiter = createRateLimiter();
 
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig().thor ?? {};
+    const config = useRuntimeConfig().ray ?? {};
 
-    forwardBrowserReport(useThor(config), {
+    forwardBrowserReport(useRay(config), {
         body: await readRawBody(event, 'utf8'),
         headers: getRequestHeaders(event),
         address: addressOf(event),

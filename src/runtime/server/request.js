@@ -1,4 +1,4 @@
-const SENSITIVE = new Set(['authorization', 'cookie', 'set-cookie', 'x-api-key', 'x-dockthor-token']);
+const SENSITIVE = new Set(['authorization', 'cookie', 'set-cookie', 'x-api-key', 'x-dockray-token']);
 
 /**
  * Reads an H3 event without importing h3.

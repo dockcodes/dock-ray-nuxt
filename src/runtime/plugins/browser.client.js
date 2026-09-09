@@ -1,4 +1,4 @@
-import { collectorConfig, startCollector } from '@dockcodes/dock-thor/browser';
+import { collectorConfig, startCollector } from '@dockcodes/dock-ray/browser';
 import { defineNuxtPlugin, useRuntimeConfig } from '#imports';
 
 /**
@@ -8,7 +8,7 @@ import { defineNuxtPlugin, useRuntimeConfig } from '#imports';
  * has no project key, and giving it one would publish it.
  */
 export default defineNuxtPlugin((nuxtApp) => {
-    const options = useRuntimeConfig().public.thor?.browser;
+    const options = useRuntimeConfig().public.ray?.browser;
 
     if (!options?.enabled) {
         return;
@@ -21,8 +21,8 @@ export default defineNuxtPlugin((nuxtApp) => {
      | never sees them. Both Nuxt hooks are wired: `vue:error` for render and
      | lifecycle failures, `app:error` for a fatal boot.
      */
-    nuxtApp.hook('vue:error', (error) => window.DockThor?.captureException(normalise(error)));
-    nuxtApp.hook('app:error', (error) => window.DockThor?.captureException(normalise(error)));
+    nuxtApp.hook('vue:error', (error) => window.DockRay?.captureException(normalise(error)));
+    nuxtApp.hook('app:error', (error) => window.DockRay?.captureException(normalise(error)));
 
     if (import.meta.hot) {
         import.meta.hot.dispose(stop);
