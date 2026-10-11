@@ -5,6 +5,9 @@ import { describeEvent, routeNameFor, shouldIgnore } from './request.js';
  * exercised without a running Nuxt app.
  */
 export function registerRayHooks(nitroApp, ray, config = {}) {
+    // Always dispose inventory timers, including clients without credentials.
+    nitroApp.hooks.hook('close', () => ray.close());
+
     if (!ray.enabled) {
         return;
     }
@@ -54,7 +57,6 @@ export function registerRayHooks(nitroApp, ray, config = {}) {
         }));
     });
 
-    nitroApp.hooks.hook('close', () => ray.close());
 }
 
 /**

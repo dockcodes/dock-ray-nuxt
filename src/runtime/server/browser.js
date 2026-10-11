@@ -5,7 +5,7 @@ const MAX_BODY_BYTES = 16384;
  *
  * The browser holds no project key, so it authenticates against this app only;
  * the key is applied here. Everything in `body` came off the network and is
- * treated as untrusted — the SDK keeps the fields it recognises and refuses
+ * treated as untrusted - the SDK keeps the fields it recognises and refuses
  * the rest.
  */
 export function forwardBrowserReport(ray, { body, headers = {}, address = 'unknown', limiter }) {
@@ -39,7 +39,7 @@ export function forwardBrowserReport(ray, { body, headers = {}, address = 'unkno
 
 /**
  * A fixed window per address, held in process memory. It exists to stop one
- * looping page from flooding the panel, not to be an authorisation boundary —
+ * looping page from flooding the panel, not to be an authorisation boundary -
  * so a per-instance counter is enough, and no shared store is worth the cost.
  */
 export function createRateLimiter({ limit = 20, windowMs = 60000, maxKeys = 10000 } = {}) {

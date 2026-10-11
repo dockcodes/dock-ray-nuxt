@@ -20,6 +20,11 @@ export default defineNuxtModule({
         url: 'https://dockray.io',
         environment: '',
         release: '',
+        // Null means unset; runtime RAY_INVENTORY is then used. Explicit false wins.
+        inventoryEnabled: null,
+        inventoryExcludePackages: null,
+        inventoryProjectDirectory: '',
+        inventoryStateDirectory: '',
         sampleRate: 1,
         tracesSampleRate: 0,
         sendDefaultPii: false,
@@ -38,7 +43,7 @@ export default defineNuxtModule({
         /*
          | Credentials go into runtimeConfig, not into `public`: everything
          | under `public` is serialised into the client bundle. The browser
-         | section is public on purpose — it holds only an endpoint path.
+         | section is public on purpose - it holds only an endpoint path.
          */
         nuxt.options.runtimeConfig.ray = {
             token: options.token,
@@ -46,6 +51,10 @@ export default defineNuxtModule({
             url: options.url,
             environment: options.environment,
             release: options.release,
+            inventoryEnabled: options.inventoryEnabled,
+            inventoryExcludePackages: options.inventoryExcludePackages,
+            inventoryProjectDirectory: options.inventoryProjectDirectory,
+            inventoryStateDirectory: options.inventoryStateDirectory,
             sampleRate: options.sampleRate,
             tracesSampleRate: options.tracesSampleRate,
             sendDefaultPii: options.sendDefaultPii,
@@ -60,6 +69,19 @@ export default defineNuxtModule({
             },
             ...nuxt.options.runtimeConfig.public.ray,
         };
+
+        // Nitro must transform #imports and import.meta flags in packaged runtime files.
+        nuxt.hook('nitro:config', (config) => {
+            config.externals ??= {};
+            config.externals.inline ??= [];
+            config.externals.inline.push(resolve('./runtime'));
+        });
+
+        // Use Nitro's resolved preset, rather than a runtime process polyfill.
+        nuxt.hook('nitro:init', (nitro) => {
+            nitro.options.replace ??= {};
+            nitro.options.replace['import.meta.dockrayNode'] = JSON.stringify(nitro.options.node !== false);
+        });
 
         addServerPlugin(resolve('./runtime/server/plugin.js'));
 
