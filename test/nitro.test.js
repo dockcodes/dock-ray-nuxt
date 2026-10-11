@@ -170,7 +170,7 @@ test('shutting Nitro down closes the client so pending reports are flushed', () 
     assert.equal(ray.calls.closed, 1);
 });
 
-test('hooks are not registered at all without credentials', () => {
+test('only the cleanup hook is registered without credentials', () => {
     const nitro = fakeNitro();
 
     registerRayHooks(nitro, new DockRayClient(), {});
@@ -178,7 +178,7 @@ test('hooks are not registered at all without credentials', () => {
     assert.equal(nitro.has('request'), false);
     assert.equal(nitro.has('afterResponse'), false);
     assert.equal(nitro.has('error'), false);
-    assert.equal(nitro.has('close'), false);
+    assert.equal(nitro.has('close'), true);
 });
 
 test('the visitor is attached only when sendDefaultPii is on', async () => {

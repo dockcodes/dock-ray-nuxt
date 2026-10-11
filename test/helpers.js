@@ -129,6 +129,7 @@ export function fakeNuxt({ ray = {}, runtimeConfig = {} } = {}) {
             experimental: {},
         },
         hooks: { hook() {}, addHooks() {} },
+        hook() {},
         callHook: async () => {},
     };
 }
